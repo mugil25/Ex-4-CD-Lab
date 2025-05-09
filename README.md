@@ -13,57 +13,43 @@ To write a YACC program to recognize a valid variable which starts with a letter
 7.	Compile these with the C compiler as gcc lex.yy.c y.tab.c
 8.	Enter a statement as input and the valid variables are identified as output.
 # PROGRAM
+## ex4.l file
 ```
-// ex4.l file
 %{
 #include "y.tab.h"
+#include <string.h>
 %}
 
 %%
-
-"int" { return INT; } "float" { return FLOAT; }
-"double" { return DOUBLE; }
-
-[a-zA-Z][a-zA-Z0-9]* {
-printf("\nIdentifier is %s", yytext); return ID;
-}
-
-. { return yytext[0]; }
-
-\n { return '\\n'; }
-
+[a-zA-Z][a-zA-Z0-9]*    { yylval.str = strdup(yytext); return IDENTIFIER; }
+\n                      { return '\n'; }
+.                       { return yytext[0]; }
 %%
 
-int yywrap() { return 1;
-}
-
-
-// ex4.y file
-
-%{
-#include <stdio.h>
-/* This YACC program is for recognizing the Expression */
-%}
-
-%token ID INT FLOAT DOUBLE
-%% D: T L;
-
-L: L ',' ID   | ID;
-
-T: INT | FLOAT | DOUBLE;
-
-%%
-extern FILE *yyin; int main() {
-do {
-yyparse();
-} while (!feof(yyin)); return 0;
-}
-
-void yyerror(char *s) { fprintf(stderr, "Error: %s\n", s);
+int yywrap() {
+    return 1;
 }
 ```
+## ex4.y file
+```
+%{
+#include "y.tab.h"
+#include <string.h>
+%}
+
+%%
+[a-zA-Z][a-zA-Z0-9]*    { yylval.str = strdup(yytext); return IDENTIFIER; }
+\n                      { return '\n'; }
+.                       { return yytext[0]; }
+%%
+
+int yywrap() {
+    return 1;
+}
+
+```
 # Output
-![Screenshot 2025-04-17 141753](https://github.com/user-attachments/assets/59e4e2ff-3b14-4207-b43c-3d78b4c0fdba)
+![Screenshot 2025-05-09 113150](https://github.com/user-attachments/assets/2ca83164-89a6-476a-b927-431f0a45b849)
 
 # Result
 A YACC program to recognize a valid variable which starts with a letter followed by any number of letters or digits is executed successfully and the output is verified.
